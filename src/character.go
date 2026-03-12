@@ -2,20 +2,20 @@ package main
 
 import "fmt"
 
-// Equipment représente les slots d'équipement du personnage
 type Equipment struct {
 	Tete  string
 	Torse string
 	Pieds string
 }
 
-// Character représente le joueur
 type Character struct {
 	Name         string
 	Class        string
 	MaxHP        int
 	CurrentHP    int
 	Level        int
+	CurrentXP    int
+	MaxXP        int
 	Inventory    []string
 	InventoryMax int
 	Money        int
@@ -23,12 +23,13 @@ type Character struct {
 	Equipment    Equipment
 }
 
-// newCharacter crée un nouveau personnage selon la classe choisie
 func newCharacter(name string, class string) Character {
 	c := Character{
 		Name:         name,
 		Class:        class,
 		Level:        1,
+		CurrentXP:    0,
+		MaxXP:        100,
 		Money:        100,
 		InventoryMax: 10,
 		Skills:       []string{"Coup de poing"},
@@ -54,12 +55,11 @@ func newCharacter(name string, class string) Character {
 	return c
 }
 
-// displayInfo affiche les informations du personnage
 func displayInfo(c *Character) {
 	fmt.Println("========== FICHE PERSONNAGE ==========")
 	fmt.Printf("  Nom    : %s\n", c.Name)
 	fmt.Printf("  Classe : %s\n", c.Class)
-	fmt.Printf("  Niveau : %d\n", c.Level)
+	fmt.Printf("  Niveau : %d (XP : %d / %d)\n", c.Level, c.CurrentXP, c.MaxXP)
 	fmt.Printf("  PV     : %d / %d\n", c.CurrentHP, c.MaxHP)
 	fmt.Printf("  Or     : %d pièces\n", c.Money)
 	fmt.Println("--------------------------------------")
@@ -87,8 +87,6 @@ func displayInfo(c *Character) {
 	fmt.Println("======================================")
 }
 
-// isDead vérifie si le personnage est mort et le ressuscite si besoin
-// Retourne true si le personnage était mort
 func isDead(c *Character) bool {
 	if c.CurrentHP <= 0 {
 		fmt.Printf("\n💀 %s est tombé à 0 PV !\n", c.Name)
@@ -99,7 +97,20 @@ func isDead(c *Character) bool {
 	return false
 }
 
-// hasSkill vérifie si le personnage possède un sort donné
+func gainXP(c *Character, amount int) {
+	c.CurrentXP += amount
+	fmt.Printf("✨ Vous gagnez %d points d'expérience !\n", amount)
+
+	for c.CurrentXP >= c.MaxXP {
+		c.Level++
+		c.CurrentXP -= c.MaxXP
+		c.MaxXP = int(float64(c.MaxXP) * 1.5)
+		c.MaxHP += 10
+		c.CurrentHP = c.MaxHP
+		fmt.Printf("\n🆙 NIVEAU SUPÉRIEUR ! Vous passez niveau %d !\n   Vos PV Max augmentent de 10. PV restaurés.\n\n", c.Level)
+	}
+}
+
 func hasSkill(c *Character, skill string) bool {
 	for _, s := range c.Skills {
 		if s == skill {
