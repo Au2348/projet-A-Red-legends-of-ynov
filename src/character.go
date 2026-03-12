@@ -56,12 +56,12 @@ func newCharacter(name string, class string) Character {
 }
 
 func displayInfo(c *Character) {
-	fmt.Println("========== FICHE PERSONNAGE ==========")
-	fmt.Printf("  Nom    : %s\n", c.Name)
+	fmt.Println(ColorCyan + "========== FICHE PERSONNAGE ==========" + ColorReset)
+	fmt.Printf("  Nom    : %s%s%s\n", ColorPurple, c.Name, ColorReset)
 	fmt.Printf("  Classe : %s\n", c.Class)
-	fmt.Printf("  Niveau : %d (XP : %d / %d)\n", c.Level, c.CurrentXP, c.MaxXP)
-	fmt.Printf("  PV     : %d / %d\n", c.CurrentHP, c.MaxHP)
-	fmt.Printf("  Or     : %d pièces\n", c.Money)
+	fmt.Printf("  Niveau : %s%d%s (XP : %d / %d)\n", ColorCyan, c.Level, ColorReset, c.CurrentXP, c.MaxXP)
+	fmt.Printf("  PV     : %s%d / %d%s\n", ColorGreen, c.CurrentHP, c.MaxHP, ColorReset)
+	fmt.Printf("  Or     : %s%d pièces%s\n", ColorYellow, c.Money, ColorReset)
 	fmt.Println("--------------------------------------")
 	fmt.Println("  Équipement :")
 	if c.Equipment.Tete != "" {
@@ -89,9 +89,9 @@ func displayInfo(c *Character) {
 
 func isDead(c *Character) bool {
 	if c.CurrentHP <= 0 {
-		fmt.Printf("\n💀 %s est tombé à 0 PV !\n", c.Name)
+		fmt.Printf(ColorRed+"\n💀 %s est tombé à 0 PV !\n"+ColorReset, c.Name)
 		c.CurrentHP = c.MaxHP / 2
-		fmt.Printf("✨ %s revient à la vie avec %d PV.\n\n", c.Name, c.CurrentHP)
+		fmt.Printf(ColorGreen+"✨ %s revient à la vie avec %d PV.\n\n"+ColorReset, c.Name, c.CurrentHP)
 		return true
 	}
 	return false
@@ -99,7 +99,7 @@ func isDead(c *Character) bool {
 
 func gainXP(c *Character, amount int) {
 	c.CurrentXP += amount
-	fmt.Printf("✨ Vous gagnez %d points d'expérience !\n", amount)
+	fmt.Printf(ColorCyan+"✨ Vous gagnez %d points d'expérience !\n"+ColorReset, amount)
 
 	for c.CurrentXP >= c.MaxXP {
 		c.Level++
@@ -107,7 +107,7 @@ func gainXP(c *Character, amount int) {
 		c.MaxXP = int(float64(c.MaxXP) * 1.5)
 		c.MaxHP += 10
 		c.CurrentHP = c.MaxHP
-		fmt.Printf("\n🆙 NIVEAU SUPÉRIEUR ! Vous passez niveau %d !\n   Vos PV Max augmentent de 10. PV restaurés.\n\n", c.Level)
+		fmt.Printf(ColorGreen+"\n🆙 NIVEAU SUPÉRIEUR ! Vous passez niveau %d !\n   Vos PV Max augmentent de 10. PV restaurés.\n\n"+ColorReset, c.Level)
 	}
 }
 

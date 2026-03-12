@@ -31,10 +31,11 @@ func trainingMenu(c *Character, reader *bufio.Reader) {
 	turn := 0
 
 	for {
+		clearScreen() // Nettoie l'écran à chaque tour
 		turn++
-		fmt.Printf("\n--- Tour %d ---\n", turn)
-		fmt.Printf("  %s : %d/%d PV\n", c.Name, c.CurrentHP, c.MaxHP)
-		fmt.Printf("  %s : %d/%d PV\n", goblin.Name, goblin.CurrentHP, goblin.MaxHP)
+		fmt.Printf(ColorCyan+"\n--- Tour %d ---\n"+ColorReset, turn)
+		fmt.Printf("  %s : %s%d/%d PV%s\n", c.Name, ColorGreen, c.CurrentHP, c.MaxHP, ColorReset)
+		fmt.Printf("  %s : %s%d/%d PV%s\n", goblin.Name, ColorRed, goblin.CurrentHP, goblin.MaxHP, ColorReset)
 
 		fmt.Println("\n  Que faites-vous ?")
 		fmt.Println("    1. Attaquer")
@@ -55,8 +56,9 @@ func trainingMenu(c *Character, reader *bufio.Reader) {
 		}
 
 		if goblin.CurrentHP <= 0 {
-			fmt.Printf("\n🏆 %s est vaincu ! Vous remportez le combat !\n", goblin.Name)
+			fmt.Printf(ColorGreen+"\n🏆 %s est vaincu ! Vous remportez le combat !\n"+ColorReset, goblin.Name)
 			gainXP(c, 30)
+			waitForInput() // Pause avant de quitter le combat
 			return
 		}
 
@@ -64,6 +66,7 @@ func trainingMenu(c *Character, reader *bufio.Reader) {
 
 		if isDead(c) {
 			fmt.Println("Le combat est terminé.")
+			waitForInput()
 			return
 		}
 	}
@@ -88,7 +91,7 @@ func joueurAttaque(c *Character, goblin *Monster, reader *bufio.Reader) {
 	critMsg := ""
 	if isCrit {
 		critMultiplier = 2
-		critMsg = " (COUP CRITIQUE ! 💥)"
+		critMsg = ColorRed + " (COUP CRITIQUE ! 💥)" + ColorReset
 	}
 
 	switch input {
@@ -101,7 +104,7 @@ func joueurAttaque(c *Character, goblin *Monster, reader *bufio.Reader) {
 		if hasBouleDeFeu {
 			degats := 18
 			goblin.CurrentHP -= degats
-			fmt.Printf("  🔥 %s lance une Boule de Feu et inflige %d dégâts à %s ! (%s : %d/%d PV)\n",
+			fmt.Printf(ColorPurple+"  🔥 %s lance une Boule de Feu et inflige %d dégâts à %s ! (%s : %d/%d PV)\n"+ColorReset,
 				c.Name, degats, goblin.Name, goblin.Name, goblin.CurrentHP, goblin.MaxHP)
 		} else {
 			fmt.Println("  ❌ Vous ne connaissez pas ce sort !")
@@ -127,5 +130,6 @@ func goblinAttaque(c *Character, goblin *Monster, turn int) {
 
 	c.CurrentHP -= degats
 	fmt.Println(message)
+	time.Sleep(1 * time.Second) // Petite pause pour lire l'attaque de l'ennemi
 	fmt.Printf("  (%s : %d/%d PV)\n", c.Name, c.CurrentHP, c.MaxHP)
 }

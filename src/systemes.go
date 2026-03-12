@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-// addInventory ajoute un objet à l'inventaire si la place le permet
 func addInventory(c *Character, item string) bool {
 	if len(c.Inventory) >= c.InventoryMax {
 		fmt.Printf("❌ Inventaire plein ! (%d/%d) Impossible d'ajouter : %s\n", len(c.Inventory), c.InventoryMax, item)
@@ -18,8 +17,6 @@ func addInventory(c *Character, item string) bool {
 	return true
 }
 
-// removeFromInventory retire la première occurrence d'un objet de l'inventaire
-// Retourne true si l'objet a bien été trouvé et retiré
 func removeFromInventory(c *Character, item string) bool {
 	for i, v := range c.Inventory {
 		if v == item {
@@ -30,7 +27,6 @@ func removeFromInventory(c *Character, item string) bool {
 	return false
 }
 
-// countItem compte combien de fois un objet apparaît dans l'inventaire
 func countItem(c *Character, item string) int {
 	count := 0
 	for _, v := range c.Inventory {
@@ -41,10 +37,10 @@ func countItem(c *Character, item string) int {
 	return count
 }
 
-// accessInventory affiche l'inventaire et permet d'utiliser des potions
 func accessInventory(c *Character, reader *bufio.Reader) {
+	clearScreen()
 	for {
-		fmt.Println("\n========== INVENTAIRE ==========")
+		fmt.Println(ColorBlue + "\n========== INVENTAIRE ==========" + ColorReset)
 		if len(c.Inventory) == 0 {
 			fmt.Println("  (inventaire vide)")
 		} else {
@@ -69,7 +65,7 @@ func accessInventory(c *Character, reader *bufio.Reader) {
 				if c.CurrentHP > c.MaxHP {
 					c.CurrentHP = c.MaxHP
 				}
-				fmt.Printf("🧪 Vous buvez une Potion de Vie et récupérez %d PV. (PV : %d/%d)\n", heal, c.CurrentHP, c.MaxHP)
+				fmt.Printf(ColorGreen+"🧪 Vous buvez une Potion de Vie et récupérez %d PV. (PV : %d/%d)\n"+ColorReset, heal, c.CurrentHP, c.MaxHP)
 			} else {
 				fmt.Println("❌ Vous n'avez pas de Potion de Vie.")
 			}
@@ -81,11 +77,11 @@ func accessInventory(c *Character, reader *bufio.Reader) {
 	}
 }
 
-// merchantMenu affiche le menu du marchand
 func merchantMenu(c *Character, reader *bufio.Reader) {
+	clearScreen()
 	for {
-		fmt.Println("\n========== MARCHAND ==========")
-		fmt.Printf("  Votre or : %d pièces\n", c.Money)
+		fmt.Println(ColorYellow + "\n========== MARCHAND ==========" + ColorReset)
+		fmt.Printf("  Votre or : %s%d pièces%s\n", ColorYellow, c.Money, ColorReset)
 		fmt.Println("------------------------------")
 		fmt.Println("  Potions :")
 		fmt.Println("    1. Potion de Vie        (3 po)  - Rend 50 PV")
@@ -138,7 +134,6 @@ func merchantMenu(c *Character, reader *bufio.Reader) {
 	}
 }
 
-// achat gère l'achat d'un objet simple
 func achat(c *Character, item string, prix int) {
 	if c.Money < prix {
 		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : %d po)\n", c.Money, prix)
@@ -146,11 +141,10 @@ func achat(c *Character, item string, prix int) {
 	}
 	if addInventory(c, item) {
 		c.Money -= prix
-		fmt.Printf("💰 Vous achetez %s pour %d po. Or restant : %d po.\n", item, prix, c.Money)
+		fmt.Printf(ColorGreen+"💰 Vous achetez %s pour %d po. Or restant : %d po.\n"+ColorReset, item, prix, c.Money)
 	}
 }
 
-// achatPoison gère l'achat et l'effet de la potion de poison
 func achatPoison(c *Character) {
 	if c.Money < 6 {
 		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : 6 po)\n", c.Money)
@@ -168,11 +162,11 @@ func achatPoison(c *Character) {
 	isDead(c)
 }
 
-// blacksmithMenu affiche le menu de la forge (crafting)
 func blacksmithMenu(c *Character, reader *bufio.Reader) {
+	clearScreen()
 	for {
-		fmt.Println("\n========== FORGE ==========")
-		fmt.Printf("  Votre or : %d pièces (coût forge : +5 po par objet)\n", c.Money)
+		fmt.Println(ColorRed + "\n========== FORGE ==========" + ColorReset)
+		fmt.Printf("  Votre or : %s%d pièces%s (coût forge : +5 po par objet)\n", ColorYellow, c.Money, ColorReset)
 		fmt.Println("---------------------------")
 		fmt.Println("  1. Chapeau de l'aventurier  (5 po + 1 Plume + 1 Cuir)     → +10 PV Max, slot Tête")
 		fmt.Println("  2. Tunique de l'aventurier  (5 po + 2 Fourrures + 1 Peau)  → +25 PV Max, slot Torse")
@@ -204,15 +198,12 @@ func blacksmithMenu(c *Character, reader *bufio.Reader) {
 	}
 }
 
-// forger tente de fabriquer un équipement si les ressources sont suffisantes
 func forger(c *Character, itemName string, cout int, bonusHP int, materiaux []string, slot string) {
-	// Vérifier l'or
 	if c.Money < cout {
 		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : %d po)\n", c.Money, cout)
 		return
 	}
 
-	// Vérifier les matériaux (en tenant compte des doublons)
 	besoins := make(map[string]int)
 	for _, m := range materiaux {
 		besoins[m]++
@@ -224,7 +215,6 @@ func forger(c *Character, itemName string, cout int, bonusHP int, materiaux []st
 		}
 	}
 
-	// Retirer les matériaux
 	for mat, quantite := range besoins {
 		for i := 0; i < quantite; i++ {
 			removeFromInventory(c, mat)
@@ -232,7 +222,6 @@ func forger(c *Character, itemName string, cout int, bonusHP int, materiaux []st
 	}
 	c.Money -= cout
 
-	// Équiper l'objet (l'ancien retourne dans l'inventaire si le slot est occupé)
 	var ancien string
 	switch slot {
 	case "Tete":
@@ -251,7 +240,6 @@ func forger(c *Character, itemName string, cout int, bonusHP int, materiaux []st
 		addInventory(c, ancien)
 	}
 
-	// Appliquer le bonus
 	c.MaxHP += bonusHP
 	c.CurrentHP += bonusHP
 	fmt.Printf("⚒️  %s fabriqué et équipé ! +%d PV Max.\n", itemName, bonusHP)
