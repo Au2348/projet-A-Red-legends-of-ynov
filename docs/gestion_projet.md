@@ -9,7 +9,7 @@ Ce document détaille l'organisation, la planification et les choix techniques a
 Le projet a été divisé en deux pôles principaux pour optimiser le développement :
 
 #### Backend / Logique du Jeu
--   **Responsable** : [Prénom/Nom de la camarade]
+-   **Responsable** : Aurélie
 -   **Missions** :
     -   Définition des structures de données (`Character`, `Monster`, `Equipment`).
     -   Implémentation des mécaniques de jeu : combat au tour par tour, gain d'expérience, montée de niveau.
@@ -17,7 +17,7 @@ Le projet a été divisé en deux pôles principaux pour optimiser le développe
     -   Gestion de la logique de persistance des données du joueur (PV, or, objets).
 
 #### Frontend / Interface Utilisateur (CLI)
--   **Responsable** : [Ton Prénom/Nom]
+-   **Responsable** : ADAMA DEZE KONATE
 -   **Missions** :
     -   Conception de l'affichage des menus principaux et des sous-menus.
     -   Gestion des entrées et des choix de l'utilisateur.
