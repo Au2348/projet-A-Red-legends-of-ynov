@@ -1,4 +1,4 @@
-package main
+package logic
 
 import "fmt"
 
@@ -9,18 +9,21 @@ type Equipment struct {
 }
 
 type Character struct {
-	Name         string
-	Class        string
-	MaxHP        int
-	CurrentHP    int
-	Level        int
-	CurrentXP    int
-	MaxXP        int
-	Inventory    []string
-	InventoryMax int
-	Money        int
-	Skills       []string
-	Equipment    Equipment
+	Name              string
+	Class             string
+	MaxHP             int
+	CurrentHP         int
+	Level             int
+	CurrentXP         int
+	MaxXP             int
+	Inventory         []string
+	InventoryMax      int
+	InventoryUpgrades int
+	Mana              int
+	MaxMana           int
+	Money             int
+	Skills            []string
+	Equipment         Equipment
 }
 
 func newCharacter(name string, class string) Character {
@@ -41,26 +44,41 @@ func newCharacter(name string, class string) Character {
 	case "Humain":
 		c.MaxHP = 100
 		c.CurrentHP = 50
+		c.MaxMana = 30
 	case "Elfe":
 		c.MaxHP = 80
 		c.CurrentHP = 40
+		c.MaxMana = 50
 	case "Nain":
 		c.MaxHP = 120
 		c.CurrentHP = 60
+		c.MaxMana = 20
 	default:
 		c.MaxHP = 100
 		c.CurrentHP = 50
+		c.MaxMana = 30
 	}
+	c.Mana = c.MaxMana
 
 	return c
 }
 
 func displayInfo(c *Character) {
-	fmt.Println(ColorCyan + "========== FICHE PERSONNAGE ==========" + ColorReset)
+	fmt.Println(ColorCyan + `
+       /\
+      /  \    ========== FICHE PERSONNAGE ==========
+     |    |
+     |    |
+    /| |\ |
+    \| |/ |
+     |    |
+     |____|
+` + ColorReset)
 	fmt.Printf("  Nom    : %s%s%s\n", ColorPurple, c.Name, ColorReset)
 	fmt.Printf("  Classe : %s\n", c.Class)
 	fmt.Printf("  Niveau : %s%d%s (XP : %d / %d)\n", ColorCyan, c.Level, ColorReset, c.CurrentXP, c.MaxXP)
 	fmt.Printf("  PV     : %s%d / %d%s\n", ColorGreen, c.CurrentHP, c.MaxHP, ColorReset)
+	fmt.Printf("  Mana   : %s%d / %d%s\n", ColorBlue, c.Mana, c.MaxMana, ColorReset)
 	fmt.Printf("  Or     : %s%d pièces%s\n", ColorYellow, c.Money, ColorReset)
 	fmt.Println("--------------------------------------")
 	fmt.Println("  Équipement :")
@@ -89,7 +107,14 @@ func displayInfo(c *Character) {
 
 func isDead(c *Character) bool {
 	if c.CurrentHP <= 0 {
-		fmt.Printf(ColorRed+"\n💀 %s est tombé à 0 PV !\n"+ColorReset, c.Name)
+		fmt.Printf(ColorRed+`
+      _____
+     /     \
+    | () () |
+     \  ^  /
+      |||||
+    💀 %s est tombé à 0 PV !
+`+ColorReset+"\n", c.Name)
 		c.CurrentHP = c.MaxHP / 2
 		fmt.Printf(ColorGreen+"✨ %s revient à la vie avec %d PV.\n\n"+ColorReset, c.Name, c.CurrentHP)
 		return true
@@ -107,7 +132,12 @@ func gainXP(c *Character, amount int) {
 		c.MaxXP = int(float64(c.MaxXP) * 1.5)
 		c.MaxHP += 10
 		c.CurrentHP = c.MaxHP
-		fmt.Printf(ColorGreen+"\n🆙 NIVEAU SUPÉRIEUR ! Vous passez niveau %d !\n   Vos PV Max augmentent de 10. PV restaurés.\n\n"+ColorReset, c.Level)
+		fmt.Printf(ColorGreen+`
+       /\
+      /__\   🆙 NIVEAU SUPÉRIEUR !
+     /\  /\     Vous passez niveau %d !
+    /__\/__\    Vos PV Max augmentent de 10. PV restaurés.
+`+ColorReset+"\n\n", c.Level)
 	}
 }
 

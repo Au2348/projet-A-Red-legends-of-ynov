@@ -15,6 +15,7 @@ Le projet a été divisé en deux pôles principaux pour optimiser le développe
     -   Implémentation des mécaniques de jeu : combat au tour par tour, gain d'expérience, montée de niveau.
     -   Développement des systèmes annexes : inventaire, marchand, forge.
     -   Gestion de la logique de persistance des données du joueur (PV, or, objets).
+    -   Mise en place de l'architecture modulaire (`go.mod`, séparation en packages).
 
 #### Frontend / Interface Utilisateur (CLI)
 -   **Responsable** : ADAMA DEZE KONATE
@@ -22,6 +23,8 @@ Le projet a été divisé en deux pôles principaux pour optimiser le développe
     -   Conception de l'affichage des menus principaux et des sous-menus.
     -   Gestion des entrées et des choix de l'utilisateur.
     -   Mise en forme de la sortie terminal avec des couleurs ANSI pour une meilleure lisibilité et immersion.
+    -   Intégration d'illustrations en ASCII Art pour chaque action et événement.
+    -   Développement de la progression narrative par chapitres et scénarisation de l'aventure.
     -   Garantir une expérience utilisateur fluide et intuitive en ligne de commande.
 
 ---
@@ -44,9 +47,10 @@ Le projet a été découpé en sprints hebdomadaires :
     -   Implémentation du système d'XP et de montée de niveau.
 
 -   **Semaine 4 : Finalisation et Polissage**
-    -   Amélioration de l'interface (nettoyage d'écran, couleurs).
-    -   Phase de tests, débogage et équilibrage.
-    -   Rédaction de la documentation (`README.md`, `gestion_projet.md`).
+    -   Refonte de l'architecture avec `go.mod` et un point d'entrée `main.go` épuré.
+    -   Intégration poussée de l'ASCII Art et mise en place des quêtes narratives (Chapitres 1 à 3).
+    -   Phase de tests, débogage et équilibrage des combats de boss.
+    -   Mise à jour de la documentation et des instructions d'exécution.
 
 ---
 
@@ -57,5 +61,6 @@ Le projet a été découpé en sprints hebdomadaires :
 
 #### Structures de Données
 -   **Structs** : Le cœur de notre modèle. `Character`, `Monster`, et `Equipment` permettent de regrouper de manière cohérente les attributs de chaque entité du jeu.
+-   **Packages (Modules Go)** : Séparation stricte entre le point d'entrée (`main.go`) et la logique métier (`logic`) via l'utilisation du système de modules Go.
 -   **Slices** : Idéales pour gérer des collections de taille dynamique comme l'inventaire (`[]string`) et la liste des sorts appris, offrant flexibilité et performance.
 -   **Maps** : Utilisées de manière ciblée, notamment dans la fonction de forge (`forger`) pour valider la présence des matériaux requis, ce qui permet une vérification rapide et efficace.

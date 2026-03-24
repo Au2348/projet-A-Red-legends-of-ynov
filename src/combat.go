@@ -1,4 +1,4 @@
-package main
+package logic
 
 import (
 	"bufio"
@@ -7,6 +7,10 @@ import (
 	"strings"
 	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 type Monster struct {
 	Name      string
@@ -24,14 +28,39 @@ func newGoblin(level int) Monster {
 	}
 }
 
+func newWolf(level int) Monster {
+	return Monster{
+		Name:      fmt.Sprintf("Loup Enragé (Niv. %d)", level),
+		MaxHP:     50 + (level-1)*15,
+		CurrentHP: 50 + (level-1)*15,
+		Attack:    7 + (level-1)*2,
+	}
+}
+
+func newTroll(level int) Monster {
+	return Monster{
+		Name:      fmt.Sprintf("Troll des Montagnes (Niv. %d)", level),
+		MaxHP:     80 + (level-1)*20,
+		CurrentHP: 80 + (level-1)*20,
+		Attack:    12 + (level-1)*3,
+	}
+}
+
 func trainingMenu(c *Character, reader *bufio.Reader) {
-	fmt.Println("\n⚔️  Un Gobelin d'entraînement surgit !")
+	fmt.Println(ColorRed + `
+      ,   ,
+      |---|
+      |o o|
+      |___|
+      /   \
+     |     |   ⚔️  Un Gobelin d'entraînement surgit !
+     |_____|
+` + ColorReset)
 	goblin := newGoblin(c.Level)
-	rand.Seed(time.Now().UnixNano())
 	turn := 0
 
 	for {
-		clearScreen() // Nettoie l'écran à chaque tour
+		ClearScreen() // Nettoie l'écran à chaque tour
 		turn++
 		fmt.Printf(ColorCyan+"\n--- Tour %d ---\n"+ColorReset, turn)
 		fmt.Printf("  %s : %s%d/%d PV%s\n", c.Name, ColorGreen, c.CurrentHP, c.MaxHP, ColorReset)
@@ -58,27 +87,143 @@ func trainingMenu(c *Character, reader *bufio.Reader) {
 		if goblin.CurrentHP <= 0 {
 			fmt.Printf(ColorGreen+"\n🏆 %s est vaincu ! Vous remportez le combat !\n"+ColorReset, goblin.Name)
 			gainXP(c, 30)
-			waitForInput() // Pause avant de quitter le combat
+			WaitForInput() // Pause avant de quitter le combat
 			return
 		}
 
-		goblinAttaque(c, &goblin, turn)
+		monsterAttaque(c, &goblin, turn)
 
 		if isDead(c) {
 			fmt.Println("Le combat est terminé.")
-			waitForInput()
+			WaitForInput()
 			return
 		}
+
+		// Pause pour laisser le temps au joueur de lire les dégâts du tour
+		WaitForInput()
 	}
 }
 
-func joueurAttaque(c *Character, goblin *Monster, reader *bufio.Reader) {
+func StartForestEncounter(c *Character, reader *bufio.Reader) {
+	fmt.Println(ColorRed + `
+      ,  ,
+      \  /
+      (oo)
+      /--\   🐺 Un Loup Enragé bondit hors des fourrés !
+     /____\
+` + ColorReset)
+	wolf := newWolf(c.Level)
+	turn := 0
+
+	for {
+		ClearScreen() // Nettoie l'écran à chaque tour
+		turn++
+		fmt.Printf(ColorCyan+"\n--- Tour %d ---\n"+ColorReset, turn)
+		fmt.Printf("  %s : %s%d/%d PV%s\n", c.Name, ColorGreen, c.CurrentHP, c.MaxHP, ColorReset)
+		fmt.Printf("  %s : %s%d/%d PV%s\n", wolf.Name, ColorRed, wolf.CurrentHP, wolf.MaxHP, ColorReset)
+
+		fmt.Println("\n  Que faites-vous ?")
+		fmt.Println("    1. Attaquer")
+		fmt.Println("    2. Inventaire")
+		fmt.Print("  Votre choix : ")
+
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		switch input {
+		case "1":
+			joueurAttaque(c, &wolf, reader)
+		case "2":
+			accessInventory(c, reader)
+			continue
+		default:
+			fmt.Println("  Choix invalide, vous perdez votre tour !")
+		}
+
+		if wolf.CurrentHP <= 0 {
+			fmt.Printf(ColorGreen+"\n🏆 %s est vaincu ! Vous remportez le combat !\n"+ColorReset, wolf.Name)
+			gainXP(c, 45)
+			addInventory(c, "Fourrure de Loup") // Récompense spéciale
+			WaitForInput()                      // Pause avant de quitter le combat
+			return
+		}
+
+		monsterAttaque(c, &wolf, turn)
+
+		if isDead(c) {
+			fmt.Println("Le combat est terminé.")
+			WaitForInput()
+			return
+		}
+
+		WaitForInput() // Pause de lecture
+	}
+}
+
+func StartFortressEncounter(c *Character, reader *bufio.Reader) {
+	fmt.Println(ColorPurple + `
+      .---.
+     /     \
+    | O   O |
+    |   ^   |
+     \  -  /    🧌 Un immense Troll des Montagnes bloque le passage !
+     /_____\
+` + ColorReset)
+	troll := newTroll(c.Level)
+	turn := 0
+
+	for {
+		ClearScreen()
+		turn++
+		fmt.Printf(ColorCyan+"\n--- Tour %d ---\n"+ColorReset, turn)
+		fmt.Printf("  %s : %s%d/%d PV%s\n", c.Name, ColorGreen, c.CurrentHP, c.MaxHP, ColorReset)
+		fmt.Printf("  %s : %s%d/%d PV%s\n", troll.Name, ColorPurple, troll.CurrentHP, troll.MaxHP, ColorReset)
+
+		fmt.Println("\n  Que faites-vous ?")
+		fmt.Println("    1. Attaquer")
+		fmt.Println("    2. Inventaire")
+		fmt.Print("  Votre choix : ")
+
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		switch input {
+		case "1":
+			joueurAttaque(c, &troll, reader)
+		case "2":
+			accessInventory(c, reader)
+			continue
+		default:
+			fmt.Println("  Choix invalide, vous perdez votre tour !")
+		}
+
+		if troll.CurrentHP <= 0 {
+			fmt.Printf(ColorGreen+"\n🏆 %s est vaincu ! Vous avez libéré la forteresse !\n"+ColorReset, troll.Name)
+			gainXP(c, 80)
+			addInventory(c, "Peau de Troll")
+			WaitForInput()
+			return
+		}
+
+		monsterAttaque(c, &troll, turn)
+
+		if isDead(c) {
+			fmt.Println("Le combat est terminé. La forteresse restera maudite...")
+			WaitForInput()
+			return
+		}
+
+		WaitForInput()
+	}
+}
+
+func joueurAttaque(c *Character, m *Monster, reader *bufio.Reader) {
 	fmt.Println("\n  Choisissez votre attaque :")
 	fmt.Println("    1. Coup de poing (8 dégâts)")
 
 	hasBouleDeFeu := hasSkill(c, "Boule de Feu")
 	if hasBouleDeFeu {
-		fmt.Println("    2. Boule de Feu  (18 dégâts)")
+		fmt.Println("    2. Boule de Feu  (18 dégâts, 20 Mana)")
 	}
 
 	fmt.Print("  Votre choix : ")
@@ -97,15 +242,20 @@ func joueurAttaque(c *Character, goblin *Monster, reader *bufio.Reader) {
 	switch input {
 	case "1":
 		degats := 8 * critMultiplier
-		goblin.CurrentHP -= degats
+		m.CurrentHP -= degats
 		fmt.Printf("  👊 %s inflige %d dégâts%s à %s avec Coup de poing. (%s : %d/%d PV)\n",
-			c.Name, degats, critMsg, goblin.Name, goblin.Name, goblin.CurrentHP, goblin.MaxHP)
+			c.Name, degats, critMsg, m.Name, m.Name, m.CurrentHP, m.MaxHP)
 	case "2":
 		if hasBouleDeFeu {
+			if c.Mana < 20 {
+				fmt.Println("  ❌ Pas assez de mana ! L'attaque échoue.")
+				return
+			}
+			c.Mana -= 20
 			degats := 18
-			goblin.CurrentHP -= degats
+			m.CurrentHP -= degats
 			fmt.Printf(ColorPurple+"  🔥 %s lance une Boule de Feu et inflige %d dégâts à %s ! (%s : %d/%d PV)\n"+ColorReset,
-				c.Name, degats, goblin.Name, goblin.Name, goblin.CurrentHP, goblin.MaxHP)
+				c.Name, degats, m.Name, m.Name, m.CurrentHP, m.MaxHP)
 		} else {
 			fmt.Println("  ❌ Vous ne connaissez pas ce sort !")
 		}
@@ -114,22 +264,21 @@ func joueurAttaque(c *Character, goblin *Monster, reader *bufio.Reader) {
 	}
 }
 
-func goblinAttaque(c *Character, goblin *Monster, turn int) {
+func monsterAttaque(c *Character, m *Monster, turn int) {
 	var degats int
 	var message string
 
 	if turn%3 == 0 {
-		degats = goblin.Attack * 2
+		degats = m.Attack * 2
 		message = fmt.Sprintf("  💥 %s se déchaîne et inflige %d dégâts à %s ! (Attaque puissante !)",
-			goblin.Name, degats, c.Name)
+			m.Name, degats, c.Name)
 	} else {
-		degats = goblin.Attack
+		degats = m.Attack
 		message = fmt.Sprintf("  🗡️  %s inflige %d dégâts à %s.",
-			goblin.Name, degats, c.Name)
+			m.Name, degats, c.Name)
 	}
 
 	c.CurrentHP -= degats
 	fmt.Println(message)
-	time.Sleep(1 * time.Second) // Petite pause pour lire l'attaque de l'ennemi
 	fmt.Printf("  (%s : %d/%d PV)\n", c.Name, c.CurrentHP, c.MaxHP)
 }

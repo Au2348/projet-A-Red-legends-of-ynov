@@ -1,4 +1,4 @@
-package main
+package logic
 
 import (
 	"bufio"
@@ -38,9 +38,15 @@ func countItem(c *Character, item string) int {
 }
 
 func accessInventory(c *Character, reader *bufio.Reader) {
-	clearScreen()
+	ClearScreen()
 	for {
-		fmt.Println(ColorBlue + "\n========== INVENTAIRE ==========" + ColorReset)
+		fmt.Println(ColorBlue + `
+      _______
+     /       \
+    | []   [] |  ========== INVENTAIRE ==========
+    |         |
+     \_______/
+` + ColorReset)
 		if len(c.Inventory) == 0 {
 			fmt.Println("  (inventaire vide)")
 		} else {
@@ -78,9 +84,14 @@ func accessInventory(c *Character, reader *bufio.Reader) {
 }
 
 func merchantMenu(c *Character, reader *bufio.Reader) {
-	clearScreen()
+	ClearScreen()
 	for {
-		fmt.Println(ColorYellow + "\n========== MARCHAND ==========" + ColorReset)
+		fmt.Println(ColorYellow + `
+       _____
+      /  $  \
+     |  $$$  |  ========== MARCHAND ==========
+      \_____/
+` + ColorReset)
 		fmt.Printf("  Votre or : %s%d pièces%s\n", ColorYellow, c.Money, ColorReset)
 		fmt.Println("------------------------------")
 		fmt.Println("  Potions :")
@@ -93,8 +104,10 @@ func merchantMenu(c *Character, reader *bufio.Reader) {
 		fmt.Println("    5. Peau de Troll         (7 po)")
 		fmt.Println("    6. Cuir de Sanglier      (3 po)")
 		fmt.Println("    7. Plume de Corbeau      (1 po)")
+		fmt.Println("  Améliorations :")
+		fmt.Println("    8. Sac à dos (+10 places) (30 po)")
 		fmt.Println("  ---------------------")
-		fmt.Println("    8. Quitter le marchand")
+		fmt.Println("    9. Quitter le marchand")
 		fmt.Print("Votre choix : ")
 
 		input, _ := reader.ReadString('\n')
@@ -126,6 +139,8 @@ func merchantMenu(c *Character, reader *bufio.Reader) {
 		case "7":
 			achat(c, "Plume de Corbeau", 1)
 		case "8":
+			UpgradeInventorySlot(c)
+		case "9":
 			fmt.Println("À bientôt, aventurier !")
 			return
 		default:
@@ -162,10 +177,30 @@ func achatPoison(c *Character) {
 	isDead(c)
 }
 
+func UpgradeInventorySlot(c *Character) {
+	if c.InventoryUpgrades >= 3 {
+		fmt.Println("❌ Vous avez déjà atteint le maximum d'améliorations d'inventaire.")
+		return
+	}
+	if c.Money < 30 {
+		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : 30 po)\n", c.Money)
+		return
+	}
+	c.Money -= 30
+	c.InventoryMax += 10
+	c.InventoryUpgrades++
+	fmt.Printf(ColorGreen+"🎒 Amélioration achetée ! Votre inventaire a maintenant %d places maximum. (%d/3 améliorations)\n"+ColorReset, c.InventoryMax, c.InventoryUpgrades)
+}
+
 func blacksmithMenu(c *Character, reader *bufio.Reader) {
-	clearScreen()
+	ClearScreen()
 	for {
-		fmt.Println(ColorRed + "\n========== FORGE ==========" + ColorReset)
+		fmt.Println(ColorRed + `
+      _______
+     [_______]
+      |     |    ========== FORGE ==========
+      |_____|
+` + ColorReset)
 		fmt.Printf("  Votre or : %s%d pièces%s (coût forge : +5 po par objet)\n", ColorYellow, c.Money, ColorReset)
 		fmt.Println("---------------------------")
 		fmt.Println("  1. Chapeau de l'aventurier  (5 po + 1 Plume + 1 Cuir)     → +10 PV Max, slot Tête")
