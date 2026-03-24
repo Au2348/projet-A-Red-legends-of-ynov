@@ -1,3 +1,5 @@
+// Package main est le point d'entrée du jeu "Legends of Ynov".
+// Il se concentre uniquement sur l'orchestration des chapitres et de l'histoire.
 package main
 
 import (

@@ -21,6 +21,7 @@ const (
 
 var reader = bufio.NewReader(os.Stdin)
 
+// PrintBanner affiche le titre du jeu en ASCII Art au lancement.
 func PrintBanner() {
 	fmt.Println(ColorRed + "  _                              _            __   __               ")
 	fmt.Println(" | |    ___  __ _ ___ _ __   __| |___   ___  / _|  \\ \\ / /__  _____ ")
@@ -31,6 +32,7 @@ func PrintBanner() {
 	fmt.Println(ColorCyan + "                --- PROJET RED : LE JEU DE RÔLE ---                " + ColorReset)
 }
 
+// Introduction affiche la cinématique de début (contexte de l'univers) et déclenche la création du héros.
 func Introduction() Character {
 	ClearScreen()
 	fmt.Println(ColorCyan + `
@@ -86,6 +88,7 @@ func Introduction() Character {
 	return player
 }
 
+// Quest1_TheVillage gère le Chapitre 1 : c'est le hub central permettant au joueur de se préparer et de s'entraîner.
 func Quest1_TheVillage(player *Character) {
 	isTrainingDone := false
 
@@ -168,6 +171,7 @@ func Quest1_TheVillage(player *Character) {
 	}
 }
 
+// Quest2_TheForest gère le Chapitre 2 : l'exploration de la forêt qui mène au combat contre le Loup Enragé.
 func Quest2_TheForest(player *Character) {
 	ClearScreen()
 	fmt.Println(ColorGreen + "\n--- CHAPITRE 2 : LA FORÊT SOMBRE ---" + ColorReset)
@@ -191,6 +195,7 @@ func Quest2_TheForest(player *Character) {
 	StartForestEncounter(player, reader)
 }
 
+// Quest3_TheFortress gère le Chapitre 3 : le combat épique de fin contre le gardien de la Forteresse.
 func Quest3_TheFortress(player *Character) {
 	ClearScreen()
 	fmt.Println(ColorPurple + "\n--- CHAPITRE 3 : LA FORTERESSE SOMBRE ---" + ColorReset)
@@ -212,6 +217,7 @@ func Quest3_TheFortress(player *Character) {
 	StartFortressEncounter(player, reader)
 }
 
+// characterCreation guide le joueur dans le choix de son nom et de sa classe au début de la partie.
 func characterCreation() Character {
 	var name string
 
@@ -252,6 +258,7 @@ func characterCreation() Character {
 	}
 }
 
+// isValidName s'assure que le nom du joueur ne contient que des lettres (pas de chiffres ou de ponctuation).
 func isValidName(s string) bool {
 	if len(s) == 0 {
 		return false
@@ -264,20 +271,24 @@ func isValidName(s string) bool {
 	return true
 }
 
+// formatName met la première lettre du nom en majuscule et le reste en minuscules pour un affichage plus propre.
 func formatName(s string) string {
 	s = strings.ToLower(s)
 	return strings.ToUpper(string(s[0])) + s[1:]
 }
 
+// ClearScreen efface le terminal pour rafraîchir proprement l'affichage de l'interface.
 func ClearScreen() {
 	fmt.Print("\033[H\033[2J")
 }
 
+// WaitForInput met le jeu en pause jusqu'à ce que l'utilisateur appuie sur "Entrée", permettant de lire à son rythme.
 func WaitForInput() {
 	fmt.Println(ColorYellow + "\nAppuyez sur Entrée pour continuer..." + ColorReset)
 	reader.ReadString('\n')
 }
 
+// printSeparator affiche une simple ligne de séparation colorée pour la mise en forme.
 func printSeparator() {
 	fmt.Println(ColorCyan + "----------------------------------------" + ColorReset)
 }

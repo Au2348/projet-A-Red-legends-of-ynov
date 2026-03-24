@@ -2,12 +2,14 @@ package logic
 
 import "fmt"
 
+// Equipment contient les objets actuellement équipés par le joueur.
 type Equipment struct {
 	Tete  string
 	Torse string
 	Pieds string
 }
 
+// Character regroupe toutes les statistiques, l'inventaire et les données du joueur.
 type Character struct {
 	Name              string
 	Class             string
@@ -26,6 +28,7 @@ type Character struct {
 	Equipment         Equipment
 }
 
+// newCharacter initialise un héros avec des statistiques de base spécifiques selon sa classe.
 func newCharacter(name string, class string) Character {
 	c := Character{
 		Name:         name,
@@ -63,6 +66,7 @@ func newCharacter(name string, class string) Character {
 	return c
 }
 
+// displayInfo affiche de manière formatée (avec de l'ASCII Art) la fiche complète du personnage.
 func displayInfo(c *Character) {
 	fmt.Println(ColorCyan + `
        /\
@@ -105,6 +109,7 @@ func displayInfo(c *Character) {
 	fmt.Println("======================================")
 }
 
+// isDead vérifie si les PV du personnage sont à 0 ou moins, et gère une mécanique de "résurrection".
 func isDead(c *Character) bool {
 	if c.CurrentHP <= 0 {
 		fmt.Printf(ColorRed+`
@@ -122,6 +127,7 @@ func isDead(c *Character) bool {
 	return false
 }
 
+// gainXP ajoute de l'expérience et gère la montée de niveau (et l'augmentation des stats) si le palier est atteint.
 func gainXP(c *Character, amount int) {
 	c.CurrentXP += amount
 	fmt.Printf(ColorCyan+"✨ Vous gagnez %d points d'expérience !\n"+ColorReset, amount)
@@ -141,6 +147,7 @@ func gainXP(c *Character, amount int) {
 	}
 }
 
+// hasSkill est une fonction utilitaire pour vérifier si le joueur connaît déjà un sort donné.
 func hasSkill(c *Character, skill string) bool {
 	for _, s := range c.Skills {
 		if s == skill {

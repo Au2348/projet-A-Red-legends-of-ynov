@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// addInventory tente d'ajouter un objet à l'inventaire. Retourne true si réussi, false si inventaire plein.
 func addInventory(c *Character, item string) bool {
 	if len(c.Inventory) >= c.InventoryMax {
 		fmt.Printf("❌ Inventaire plein ! (%d/%d) Impossible d'ajouter : %s\n", len(c.Inventory), c.InventoryMax, item)
@@ -17,6 +18,7 @@ func addInventory(c *Character, item string) bool {
 	return true
 }
 
+// removeFromInventory cherche et retire un seul exemplaire d'un objet spécifique. Retourne true s'il a été trouvé.
 func removeFromInventory(c *Character, item string) bool {
 	for i, v := range c.Inventory {
 		if v == item {
@@ -27,6 +29,7 @@ func removeFromInventory(c *Character, item string) bool {
 	return false
 }
 
+// countItem compte combien d'exemplaires d'un objet précis le joueur possède.
 func countItem(c *Character, item string) int {
 	count := 0
 	for _, v := range c.Inventory {
@@ -37,6 +40,7 @@ func countItem(c *Character, item string) int {
 	return count
 }
 
+// accessInventory ouvre le menu de l'inventaire permettant de visualiser ses objets et de consommer des potions de vie.
 func accessInventory(c *Character, reader *bufio.Reader) {
 	ClearScreen()
 	for {
@@ -83,6 +87,7 @@ func accessInventory(c *Character, reader *bufio.Reader) {
 	}
 }
 
+// merchantMenu ouvre l'interface du marchand où le joueur peut acheter des potions, sorts, matériaux et extensions de sac.
 func merchantMenu(c *Character, reader *bufio.Reader) {
 	ClearScreen()
 	for {
@@ -149,6 +154,7 @@ func merchantMenu(c *Character, reader *bufio.Reader) {
 	}
 }
 
+// achat est une fonction utilitaire pour traiter l'achat d'un objet courant et déduire l'or du joueur.
 func achat(c *Character, item string, prix int) {
 	if c.Money < prix {
 		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : %d po)\n", c.Money, prix)
@@ -160,6 +166,7 @@ func achat(c *Character, item string, prix int) {
 	}
 }
 
+// achatPoison gère l'événement humoristique "piège" de la potion de poison vendue par le marchand.
 func achatPoison(c *Character) {
 	if c.Money < 6 {
 		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : 6 po)\n", c.Money)
@@ -177,6 +184,7 @@ func achatPoison(c *Character) {
 	isDead(c)
 }
 
+// UpgradeInventorySlot permet au joueur d'acheter plus d'espace dans son inventaire (limité à 3 améliorations).
 func UpgradeInventorySlot(c *Character) {
 	if c.InventoryUpgrades >= 3 {
 		fmt.Println("❌ Vous avez déjà atteint le maximum d'améliorations d'inventaire.")
@@ -192,6 +200,7 @@ func UpgradeInventorySlot(c *Character) {
 	fmt.Printf(ColorGreen+"🎒 Amélioration achetée ! Votre inventaire a maintenant %d places maximum. (%d/3 améliorations)\n"+ColorReset, c.InventoryMax, c.InventoryUpgrades)
 }
 
+// blacksmithMenu ouvre l'interface de la forge pour créer des pièces d'armure augmentant les PV Max.
 func blacksmithMenu(c *Character, reader *bufio.Reader) {
 	ClearScreen()
 	for {
@@ -233,6 +242,7 @@ func blacksmithMenu(c *Character, reader *bufio.Reader) {
 	}
 }
 
+// forger vérifie les prérequis (or et matériaux), consomme les ressources, et équipe automatiquement le nouvel objet.
 func forger(c *Character, itemName string, cout int, bonusHP int, materiaux []string, slot string) {
 	if c.Money < cout {
 		fmt.Printf("❌ Pas assez d'or. (Vous avez %d po, coût : %d po)\n", c.Money, cout)

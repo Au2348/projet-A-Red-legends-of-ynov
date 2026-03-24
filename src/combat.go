@@ -8,10 +8,12 @@ import (
 	"time"
 )
 
+// init est appelée automatiquement au lancement du programme pour initialiser l'aléatoire.
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// Monster regroupe les caractéristiques d'un ennemi (PV, Attaque, etc.).
 type Monster struct {
 	Name      string
 	MaxHP     int
@@ -19,6 +21,7 @@ type Monster struct {
 	Attack    int
 }
 
+// newGoblin génère un gobelin d'entraînement dont la puissance s'adapte au niveau du joueur.
 func newGoblin(level int) Monster {
 	return Monster{
 		Name:      fmt.Sprintf("Gobelin d'entraînement (Niv. %d)", level),
@@ -28,6 +31,7 @@ func newGoblin(level int) Monster {
 	}
 }
 
+// newWolf génère le monstre redoutable du Chapitre 2.
 func newWolf(level int) Monster {
 	return Monster{
 		Name:      fmt.Sprintf("Loup Enragé (Niv. %d)", level),
@@ -37,6 +41,7 @@ func newWolf(level int) Monster {
 	}
 }
 
+// newTroll génère le boss final très résistant du Chapitre 3.
 func newTroll(level int) Monster {
 	return Monster{
 		Name:      fmt.Sprintf("Troll des Montagnes (Niv. %d)", level),
@@ -46,6 +51,7 @@ func newTroll(level int) Monster {
 	}
 }
 
+// trainingMenu gère le combat tutoriel contre le gobelin dans le village (requis pour avancer).
 func trainingMenu(c *Character, reader *bufio.Reader) {
 	fmt.Println(ColorRed + `
       ,   ,
@@ -104,6 +110,7 @@ func trainingMenu(c *Character, reader *bufio.Reader) {
 	}
 }
 
+// StartForestEncounter gère le combat de l'histoire du Chapitre 2.
 func StartForestEncounter(c *Character, reader *bufio.Reader) {
 	fmt.Println(ColorRed + `
       ,  ,
@@ -160,6 +167,7 @@ func StartForestEncounter(c *Character, reader *bufio.Reader) {
 	}
 }
 
+// StartFortressEncounter gère le combat final et épique du Chapitre 3.
 func StartFortressEncounter(c *Character, reader *bufio.Reader) {
 	fmt.Println(ColorPurple + `
       .---.
@@ -217,6 +225,7 @@ func StartFortressEncounter(c *Character, reader *bufio.Reader) {
 	}
 }
 
+// joueurAttaque gère le tour du joueur, affiche ses attaques disponibles et gère la mécanique de coups critiques.
 func joueurAttaque(c *Character, m *Monster, reader *bufio.Reader) {
 	fmt.Println("\n  Choisissez votre attaque :")
 	fmt.Println("    1. Coup de poing (8 dégâts)")
@@ -264,6 +273,7 @@ func joueurAttaque(c *Character, m *Monster, reader *bufio.Reader) {
 	}
 }
 
+// monsterAttaque gère le tour de l'ennemi (celui-ci utilise une attaque chargée tous les 3 tours).
 func monsterAttaque(c *Character, m *Monster, turn int) {
 	var degats int
 	var message string
